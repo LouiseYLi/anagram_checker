@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,8 +14,11 @@ int isAnagram(FILE *input, FILE *output) {
     int index = 0;
     char inputChar;
     while (inputChar != '\n') {
+        if (inputChar == EOF) {
+            fprintf(output, "error");
+            exit(0);
+        }
         inputChar = fgetc(input);
-
         index++;
     }
     char *firstString = malloc(index * sizeof(char));
@@ -24,8 +28,17 @@ int isAnagram(FILE *input, FILE *output) {
     fgets(firstString, index, input);
 
     int index2 = index + 1;
+
+    fgetc(input);
+
     while (inputChar != EOF) {
+
         inputChar = fgetc(input);
+
+        if (inputChar == '\n') {
+            fprintf(output, "error");
+            exit(0);
+        }
 
         index2++;
     }
@@ -37,10 +50,7 @@ int isAnagram(FILE *input, FILE *output) {
 
     fgets(secondString, index2, input);
 
-    printf("first: %s second: %s\n", firstString,secondString);
-
     for (int i = 0; i < index; i++) {
-        printf("%c\n", firstString[i]);
         if (firstString[i] >= 'a' && firstString[i] <= 'z') {
             charOfWord[firstString[i] - 'a']++;
         }
@@ -62,7 +72,6 @@ int isAnagram(FILE *input, FILE *output) {
     free(secondString);
 
     for (int i = 0; i < 26; i++) {
-        printf("first: %d second: %d\n", charOfWord[i], charOfAnagram[i]);
         if(charOfWord[i] != charOfAnagram[i]) {
             fprintf(output, "0! not anagram");
             return 0;
@@ -74,15 +83,31 @@ int isAnagram(FILE *input, FILE *output) {
 }
 
 int main(int argc, char **argv){
+
     char *inputFile = argv[1];
     char *outputFile = argv[2];
 
-    FILE *input = fopen(inputFile, "r");
 
     FILE *output = fopen(outputFile, "w");
+    if (output == NULL) {
+        fprintf(output, "error");
+        exit(0);
+    }
+
+    FILE *input = fopen(inputFile, "r");
+    if (input == NULL) {
+        fprintf(output, "error");
+        exit(0);
+    }
+
+    if (argc != 3) {
+        fprintf(output, "error");
+        exit(0);
+    }
 
     isAnagram(input, output);
 
     fclose(input);
     fclose(output);
+    return 0;
 }
